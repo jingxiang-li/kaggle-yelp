@@ -1,29 +1,20 @@
-from __future__ import division, with_statement, print_function
+from __future__ import division, absolute_import
+from __future__ import print_function, unicode_literals
 import pandas as pd
-import numpy as np
-
-biz2label = pd.read_csv("/home/s_ariel/Documents/yelp/rawdata/train.csv")
-photo2biz = pd.read_csv(
-    "/home/s_ariel/Documents/yelp/rawdata/train_photo_to_biz_ids.csv")
-
-# merge two datasets together and sort according to photo id
-df = photo2biz.merge(biz2label, on="business_id")
-df.sort_values("photo_id", inplace=True)
+from transfer_features import *
 
 
-# encode labels to n-hot ways
-def encode_labels(in_label):
-    if in_label is np.nan:
-        res = ["0"] * 9
-    else:
-        ix = map(int, in_label.strip().split(" "))
-        res = ["1" if i in ix else "0" for i in range(9)]
-    return "\t".join(res)
+biz2label = pd.read_csv("rawdata/train.csv", index_col=0)
+photo2biz = pd.read_csv("rawdata/train_photo_to_biz_ids.csv", index_col=0)
+biz2label.sort_index(inplace=True)
 
-with open("train_list.txt", "w+") as fout:
-    for index, row in df.iterrows():
-        fout.write(str(row["photo_id"]))
-        fout.write("\t")
-        fout.write(encode_labels(row["labels"]))
-        fout.write("\t")
-        fout.write(str(row["photo_id"]) + ".jpg\n")
+
+for biz_id, biz_label in biz2label.iterrows():
+    photo_ids = photo2biz[photo2biz["business_id"] == biz_id].index
+    batch_size = len(photo_ids)
+    img_list = ['rawdata/train_photos/' + str(id) + '.jpg' for id in photo_ids]
+    # pprint(img_list)
+    out_file = 'features/inception-21k-global/' + str(biz_id) + '.npy'
+    X = get_features(img_list, 'models/inception-21k/Inception', 9)
+    np.save(out_file, X)
+    print(out_file, 'finished!!')

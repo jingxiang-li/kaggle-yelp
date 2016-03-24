@@ -86,3 +86,7 @@ ENV/
 
 # data
 rawdata/
+features/
+models/
+*.sublime-*
+
