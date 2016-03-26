@@ -31,3 +31,4 @@ for photo_id in photo_ids:
     X = get_features(img_list, 'models/inception-21k/Inception', 9)[0, :]
     f.write(str(photo_id) + ',')
     f.write(",".join(X.astype(str)) + '\n')
+    print(photo_id, 'finished!!')
