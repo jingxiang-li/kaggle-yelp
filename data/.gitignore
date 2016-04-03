@@ -1,3 +1,4 @@
 *.rec
 train_photos/
 test_photos/
+*.tgz

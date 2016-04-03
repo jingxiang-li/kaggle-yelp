@@ -1,0 +1,6 @@
+#!/bin/bash -l        
+#PBS -l walltime=8:00:00,nodes=1:ppn=8,mem=8gb 
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp/data
+tar zxvf test_photos.tgz
