@@ -85,8 +85,5 @@ ENV/
 .spyderproject
 
 # data
-rawdata/
-features/
-models/
 *.sublime-*
-
+notebooks/
