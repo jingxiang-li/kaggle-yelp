@@ -1,0 +1,6 @@
+#!/bin/bash -l
+#PBS -l walltime=8:00:00,nodes=1:ppn=24,mem=8gb
+
+source ~/.bashrc
+cd ../data
+/home/yangyh/lixx3899/Apps/mxnet/bin/im2rec ./imglist_train.txt ./train_photos/ img_train.rec resize=224 label_width=9 center_crop=1
