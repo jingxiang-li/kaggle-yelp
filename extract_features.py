@@ -61,4 +61,5 @@ if __name__ == '__main__':
         args.batch_size,
         devs)
     preds = extractor.predict(img_iter)[:, :, 0, 0]
+    print(preds.shape)
     np.save(args.output_path, preds)
