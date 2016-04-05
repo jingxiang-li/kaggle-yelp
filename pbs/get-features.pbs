@@ -20,5 +20,5 @@ python extract_features.py --imgrec_path 'data/img_test.rec' --imglist_path 'dat
   --output_path 'feature/inception-v3-test.npy'
 
 python extract_features.py --imgrec_path 'sample_data/img_train.rec' --imglist_path 'sample_data/imglist_train.txt' --label_width 9 \
-  --model_prefix 'pretrained/inception-21k/Inception' --num_round 9 --batch_size 16 --devs '0' \
+  --model_prefix 'pretrained/inception-v3/Inception-7' --num_round 1 --batch_size 16 --devs '0' \
   --output_path 'sample_data/inception-21k-train.npy'

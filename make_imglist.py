@@ -34,11 +34,11 @@ def main(prefix="sample_data/"):
     fout.close()
     print("imglist_train.txt Comlete!!!")
 
-    # process test data
-    photo2biz = pd.read_csv(
-        path.join(prefix, 'test_photo_to_biz.csv'), index_col='photo_id')
+    # process test data, there are duplications in test photo_id
+    photo2biz = pd.read_csv(path.join(prefix, 'test_photo_to_biz.csv'))
+    photo_ids = photo2biz["photo_id"].unique()
     fout = open(path.join(prefix, "imglist_test.txt"), "w")
-    for photo_id, row in photo2biz.iterrows():
+    for photo_id in photo_ids:
         fout.write(str(photo_id) + "\t")
         fout.write("0" + "\t")
         fout.write(str(photo_id) + ".jpg\n")
