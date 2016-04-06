@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 from os import path
 import pandas as pd
+from sys import argv
 
 
 def get_colHist(img_path):
@@ -31,56 +32,63 @@ def get_colHist(img_path):
     return features
 
 
-# handle training data
-prefix = "/home/s_ariel/Documents/kaggle-yelp/data/"
-dataframe = pd.read_csv(
-    path.join(
-        prefix,
-        "imglist_train.txt"),
-    sep="\t",
-    header=None)
-img_names = dataframe.ix[:, 0].astype(str)
-img_list = [
-    path.join(
-        prefix,
-        "train_photos/",
-        img_name +
-        ".jpg") for img_name in img_names]
+def main(prefix):
+    # handle training data
+    # prefix = "/home/s_ariel/Documents/kaggle-yelp/data/"
+    dataframe = pd.read_csv(
+        path.join(
+            prefix,
+            "imglist_train.txt"),
+        sep="\t",
+        header=None)
+    img_names = dataframe.ix[:, 0].astype(str)
+    img_list = [
+        path.join(
+            prefix,
+            "train_photos/",
+            img_name +
+            ".jpg") for img_name in img_names]
 
-number_imgs = len(img_list)
-result_matrix = np.zeros((number_imgs, 64 * 6 + 2), dtype="float32")
-for i, img_path in enumerate(img_list):
-    feature = get_colHist(img_path)
-    result_matrix[i, :] = feature
-    if i % 2000 == 0:
-        print(i)
+    number_imgs = len(img_list)
+    result_matrix = np.zeros((number_imgs, 64 * 6 + 2), dtype="float32")
+    for i, img_path in enumerate(img_list):
+        feature = get_colHist(img_path)
+        result_matrix[i, :] = feature
+        if i % 2000 == 0:
+            print(i)
 
-print(result_matrix.shape)
-np.save(path.join(prefix, "colHist-train.npy"), result_matrix)
-del result_matrix
+    print(result_matrix.shape)
+    np.save(path.join(prefix, "colHist-train.npy"), result_matrix)
+    del result_matrix
 
-# handle test data
-dataframe = pd.read_csv(
-    path.join(
-        prefix,
-        "imglist_test.txt"),
-    sep="\t",
-    header=None)
-img_names = dataframe.ix[:, 0].astype(str)
-img_list = [
-    path.join(
-        prefix,
-        "test_photos/",
-        img_name +
-        ".jpg") for img_name in img_names]
+    # handle test data
+    dataframe = pd.read_csv(
+        path.join(
+            prefix,
+            "imglist_test.txt"),
+        sep="\t",
+        header=None)
+    img_names = dataframe.ix[:, 0].astype(str)
+    img_list = [
+        path.join(
+            prefix,
+            "test_photos/",
+            img_name +
+            ".jpg") for img_name in img_names]
 
-number_imgs = len(img_list)
-result_matrix = np.zeros((number_imgs, 64 * 6 + 2), dtype="float32")
-for i, img_path in enumerate(img_list):
-    feature = get_colHist(img_path)
-    result_matrix[i, :] = feature
-    if i % 2000 == 0:
-        print(i)
+    number_imgs = len(img_list)
+    result_matrix = np.zeros((number_imgs, 64 * 6 + 2), dtype="float32")
+    for i, img_path in enumerate(img_list):
+        feature = get_colHist(img_path)
+        result_matrix[i, :] = feature
+        if i % 2000 == 0:
+            print(i)
 
-print(result_matrix.shape)
-np.save(path.join(prefix, "colHist-test.npy"), result_matrix)
+    print(result_matrix.shape)
+    np.save(path.join(prefix, "colHist-test.npy"), result_matrix)
+
+
+if __name__ == "__main__":
+    assert(len(argv) == 2)
+    prefix = argv[1]
+    main(prefix)
