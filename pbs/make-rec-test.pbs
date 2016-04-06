@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#PBS -l walltime=8:00:00,nodes=1:ppn=24,mem=8gb
+#PBS -l walltime=6:00:00,nodes=1:ppn=24,mem=16gb
 
 source ~/.bashrc
 cd /home/yangyh/lixx3899/kaggle-yelp/data

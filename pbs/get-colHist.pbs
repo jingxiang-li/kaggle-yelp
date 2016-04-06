@@ -1,0 +1,6 @@
+#!/bin/bash -l
+#PBS -l walltime=3:00:00,nodes=1:ppn=24,mem=16gb
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp
+python extract_colhist.py "/home/yangyh/lixx3899/kaggle-yelp/sample_data"
