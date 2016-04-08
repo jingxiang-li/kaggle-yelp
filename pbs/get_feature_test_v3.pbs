@@ -1,0 +1,8 @@
+#!/bin/bash -l
+#PBS -l walltime=12:00:00,nodes=1:ppn=24,mem=32gb
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp
+python extract_features.py --imgrec_path 'data/img_test_299.rec' --imglist_path 'data/imglist_test.txt' --label_width 1 \
+  --model_prefix 'pretrained/inception-v3/Inception-7' --num_round 1 --batch_size 256 --devs '0, 1' \
+  --output_path 'feature/inception-v3-test.npy'

@@ -6,10 +6,10 @@ import argparse
 def get_iter(imgrec_path, imglist_path, label_width, batch_size, mean_value):
     result = mx.io.ImageRecordIter(
         path_imgrec=imgrec_path,
-        data_shape=(3, 224, 224),
+        data_shape=(3, 299, 299),
         path_imglist=imglist_path,
         label_width=label_width,
-        batch_size=1,
+        batch_size=batch_size,
         mean_r=mean_value,
         mean_g=mean_value,
         mean_b=mean_value,
