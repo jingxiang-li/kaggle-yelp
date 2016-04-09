@@ -119,7 +119,7 @@ def optimize(trials, X, y, y_ix, reps, max_evals):
     space = {
         'n_estimators': hp.quniform('n_estimators', 30, 150, 30),
         'criterion': hp.choice('criterion', ['gini', 'entropy']),
-        'max_depth': hp.quniform('max_depth', 2, 6, 1),
+        'max_depth': hp.quniform('max_depth', 1, 5, 1),
         'min_samples_split': hp.quniform('min_samples_split', 1, 9, 2),
         'min_samples_leaf': hp.quniform('min_samples_leaf', 1, 5, 1),
         'bootstrap': False,
