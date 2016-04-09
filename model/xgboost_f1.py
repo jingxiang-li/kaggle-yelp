@@ -88,6 +88,7 @@ def fpreproc(dtrain, dtest, param):
     param['scale_pos_weight'] = ratio
     return (dtrain, dtest, param)
 
+
 # functions for hyperparameters optimization
 
 
@@ -122,7 +123,7 @@ class Score:
 
 def optimize(trials, X, y, y_ix, reps, max_evals):
     space = {
-        'num_boost_round': hp.quniform('num_boost_round', 1, 2, 1),
+        'num_boost_round': hp.quniform('num_boost_round', 50, 250, 25),
         'eta': hp.quniform('eta', 0.1, 0.5, 0.1),
         'gamma': hp.quniform('gamma', 0, 1, 0.2),
         'max_depth': hp.quniform('max_depth', 1, 6, 1),
@@ -185,19 +186,28 @@ def get_model(params, X, y_array, y_ix, reps):
                     maximize=True)
     return bst
 
+
 if __name__ == "__main__":
     args = parse_args()
     data_dir, reps, prob = get_params(args)
     X, y = get_data_train(data_dir, args)
     trials = Trials()
-    params = optimize(trials, X, y, 0, reps, 2)
-    preds = out_fold_pred(params, X, y, 0, reps)
-    model = get_model(params, X, y, 0, reps)
 
+    # save place
+    save_dir_name = path.basename(__file__)[:-3] + "_" + \
+        str(reps) + "_" + str(int(100 * prob))
     save_dir = path.join(path.dirname(path.abspath(__file__)),
-                         path.basename(__file__)[:-3])
+                         save_dir_name)
     if not path.isdir(save_dir):
         os.mkdir(save_dir)
 
-    np.save(path.join(save_dir, "outFold.npy"), preds)
-    pickle.dump(model, open(path.join(save_dir, "model.pkl"), mode='wb'))
+    # begin trainnig
+    for y_ix in range(9):
+        logger.info("training for class " + str(y_ix))
+        params = optimize(trials, X, y, y_ix, reps, 100)
+        preds = out_fold_pred(params, X, y, y_ix, reps)
+        model = get_model(params, X, y, y_ix, reps)
+        np.save(path.join(save_dir, "outFold_" + str(y_ix) + ".npy"), preds)
+        pickle.dump(model,
+                    open(path.join(save_dir, "model_" + str(y_ix) + ".pkl"),
+                         mode='wb'))
