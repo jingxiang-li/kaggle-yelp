@@ -1,0 +1,8 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=24,mem=32gb
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp/model
+python randomForest.py --data_folder "../feature/9_50" --data_set "21k"
+python randomForest.py --data_folder "../feature/9_50" --data_set "v3"
+python randomForest.py --data_folder "../feature/9_50" --data_set "colHist"

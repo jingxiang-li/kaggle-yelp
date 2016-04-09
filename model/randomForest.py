@@ -205,10 +205,13 @@ if __name__ == "__main__":
     for y_ix in range(9):
         logger.info("training for class " + str(y_ix))
         trials = Trials()
-        params = optimize(trials, X, y, y_ix, reps, 1)
+        params = optimize(trials, X, y, y_ix, reps, 30)
         preds = out_fold_pred(params, X, y, y_ix, reps)
         model = get_model(params, X, y, y_ix, reps)
 
+        pickle.dump(params,
+                    open(path.join(save_dir, "param_" + str(y_ix) + ".pkl"),
+                         'wb'))
         np.save(path.join(save_dir, "outFold_" + str(y_ix) + ".npy"), preds)
         pickle.dump(model.calibrated_classifiers_,
                     open(path.join(save_dir, "model_" + str(y_ix) + ".pkl"),
