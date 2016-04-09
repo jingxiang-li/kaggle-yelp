@@ -41,7 +41,7 @@ logger.setLevel(logging.DEBUG)
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_folder', type=str, default="../feature/5_075")
+    parser.add_argument('--data_folder', type=str, default="../feature/5_75")
     parser.add_argument('--data_set', choices=['21k', 'v3', 'colHist'],
                         default="21k")
     return parser.parse_args()
@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
     # save place
     save_dir_name = path.basename(__file__)[:-3] + "_" + \
-        str(reps) + "_" + str(int(100 * prob))
+        str(reps) + "_" + str(int(100 * prob)) + "_" + args.data_set
     save_dir = path.join(path.dirname(path.abspath(__file__)),
                          save_dir_name)
     if not path.isdir(save_dir):
