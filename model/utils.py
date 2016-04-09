@@ -12,7 +12,6 @@ NUM_BIZ_TEST = 10000
 
 def makeKFold(n_folds, y, reps):
     assert y.shape[0] % reps == 0
-    assert int(y.shape[0] / reps) == NUM_BIZ_TRAIN
 
     y_compact = y[range(0, y.shape[0], reps)]
     SKFold = StratifiedKFold(y_compact, n_folds=n_folds, shuffle=True)
