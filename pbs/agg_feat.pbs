@@ -3,12 +3,12 @@
 
 source ~/.bashrc
 cd /home/yangyh/lixx3899/kaggle-yelp
-python ./get_features.py 0.75 5
-python ./get_features.py 0.5 5
+# python ./get_features.py 0.75 5
+# python ./get_features.py 0.5 5
 python ./get_features.py 0.75 9
 python ./get_features.py 0.5 9
 
-python ./get_feature_test.py 0.75 5
-python ./get_feature_test.py 0.5 5
-python ./get_feature_test.py 0.75 9
-python ./get_feature_test.py 0.5 9
+# python ./get_feature_test.py 0.75 5
+# python ./get_feature_test.py 0.5 5
+# python ./get_feature_test.py 0.75 9
+# python ./get_feature_test.py 0.5 9
