@@ -189,6 +189,10 @@ def get_model(params, X, y_array, y_ix, reps):
 
 if __name__ == "__main__":
     args = parse_args()
+
+    logger.info("Data Directory: " + args.data_folder)
+    logger.info("Data set: " + args.data_set)
+
     data_dir, reps, prob = get_params(args)
     X, y = get_data_train(data_dir, args)
     trials = Trials()
