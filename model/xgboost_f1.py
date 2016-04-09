@@ -123,7 +123,7 @@ class Score:
 
 def optimize(trials, X, y, y_ix, reps, max_evals):
     space = {
-        'num_boost_round': hp.quniform('num_boost_round', 50, 250, 25),
+        'num_boost_round': hp.quniform('num_boost_round', 50, 200, 25),
         'eta': hp.quniform('eta', 0.1, 0.5, 0.1),
         'gamma': hp.quniform('gamma', 0, 1, 0.2),
         'max_depth': hp.quniform('max_depth', 1, 6, 1),
@@ -183,7 +183,8 @@ def get_model(params, X, y_array, y_ix, reps):
                     num_boost_round=params['num_boost_round'],
                     evals=[(dtrain, 'train')],
                     feval=evalF1,
-                    maximize=True)
+                    maximize=True,
+                    verbose_eval=None)
     return bst
 
 
@@ -195,7 +196,6 @@ if __name__ == "__main__":
 
     data_dir, reps, prob = get_params(args)
     X, y = get_data_train(data_dir, args)
-    trials = Trials()
 
     # save place
     save_dir_name = path.basename(__file__)[:-3] + "_" + \
@@ -208,6 +208,7 @@ if __name__ == "__main__":
     # begin trainnig
     for y_ix in range(9):
         logger.info("training for class " + str(y_ix))
+        trials = Trials()
         params = optimize(trials, X, y, y_ix, reps, 50)
         preds = out_fold_pred(params, X, y, y_ix, reps)
         model = get_model(params, X, y, y_ix, reps)
@@ -215,3 +216,4 @@ if __name__ == "__main__":
         pickle.dump(model,
                     open(path.join(save_dir, "model_" + str(y_ix) + ".pkl"),
                          mode='wb'))
+        logger.info(str(y_ix) + " completes!")
