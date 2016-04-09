@@ -208,7 +208,7 @@ if __name__ == "__main__":
     # begin trainnig
     for y_ix in range(9):
         logger.info("training for class " + str(y_ix))
-        params = optimize(trials, X, y, y_ix, reps, 100)
+        params = optimize(trials, X, y, y_ix, reps, 50)
         preds = out_fold_pred(params, X, y, y_ix, reps)
         model = get_model(params, X, y, y_ix, reps)
         np.save(path.join(save_dir, "outFold_" + str(y_ix) + ".npy"), preds)
