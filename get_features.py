@@ -54,7 +54,7 @@ def main(prob=0.75, reps=5):
         "data/train.csv", index_col='business_id')
     y_train = np.zeros((X_train.shape[0], 9), dtype="int8")
     for i, biz_id in enumerate(biz_list):
-        y_train[range(5 * i, 5 * i + 5), :] = \
+        y_train[range(reps * i, reps * i + reps), :] = \
             parse_labels(biz2label.loc[biz_id]["labels"])
 
     dir_path = "feature/" + str(reps) + "_" + str(int(100 * prob))
