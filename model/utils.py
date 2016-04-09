@@ -37,7 +37,6 @@ def vote_by_mean(pred_list):
 
 def agg_preds(preds, reps, vote_func):
     assert preds.shape[0] % reps == 0
-    assert int(preds.shape[0] / reps) == NUM_BIZ_TRAIN
 
     n_samples = int(preds.shape[0] / reps)
     preds_r = np.reshape(preds, (n_samples, reps))
