@@ -217,4 +217,3 @@ if __name__ == "__main__":
                     open(path.join(save_dir, "model_" + str(y_ix) + ".pkl"),
                          'wb'))
         logger.info(str(y_ix) + " completes!")
-        break
