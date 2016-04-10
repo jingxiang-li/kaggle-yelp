@@ -1,0 +1,12 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=6,mem=12gb
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp/model
+python pca.py --data_folder "../feature/9_50" --data_set "21k"
+python pca.py --data_folder "../feature/9_50" --data_set "v3"
+python pca.py --data_folder "../feature/9_50" --data_set "colHist"
+
+python ica.py --data_folder "../feature/9_50" --data_set "21k"
+python ica.py --data_folder "../feature/9_50" --data_set "v3"
+python ica.py --data_folder "../feature/9_50" --data_set "colHist"
