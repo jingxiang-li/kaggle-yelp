@@ -108,7 +108,6 @@ def optimize(trials, X, y, y_ix, reps, max_evals):
         'max_iter': hp.quniform('max_iter', 100, 300, 50),
         'n_jobs': -1,
         'class_weight': 'balanced',
-        'solver': 'sag',
         'penalty': 'l1'
     }
     s = Score(X, y, y_ix, reps)
@@ -121,7 +120,6 @@ def optimize(trials, X, y, y_ix, reps, max_evals):
     best['max_iter'] = int(best['max_iter'])
     best['n_jobs'] = -1
     best['class_weight'] = 'balanced'
-    best['solver'] = 'sag'
     best['penalty'] = 'l1'
     del s
     return best
