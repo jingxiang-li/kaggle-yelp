@@ -16,4 +16,3 @@ for reps in [5, 9]:
             X[range(reps * ix, reps * ix + reps), :] = ftr_array[c, :]
         print(np.any(np.isnan(X)))
         np.save(data_path, X)
-    break
