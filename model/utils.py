@@ -34,6 +34,10 @@ def vote_by_mean(pred_list):
     return 1 if score > 0.5 else 0
 
 
+def mean_pool(pred_list):
+    return np.mean(pred_list)
+
+
 def agg_preds(preds, reps, vote_func):
     assert preds.shape[0] % reps == 0
 
