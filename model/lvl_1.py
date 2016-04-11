@@ -348,11 +348,11 @@ print(feature_list)
 X_train_new = np.hstack((X_train_new, X_train[:, feature_list]))
 X_test_new = np.hstack((X_test_new, X_test[:, feature_list]))
 
-save_dir = "_".join(("../level2-feature/" + args.reps, args.prob,
-                    args.data, str(args.yix)))
+save_dir = "_".join(("../level2-feature/" + str(args.yix) + "/" +
+                     args.reps, args.prob, args.data))
 
 if not path.exists(save_dir):
-    os.mkdir(save_dir)
+    os.makedirs(save_dir)
 np.save(path.join(save_dir, "X_train.npy"), X_train_new)
 np.save(path.join(save_dir, "y_train.npy"), y_train)
 np.save(path.join(save_dir, "X_test.npy"), X_test_new)
