@@ -114,7 +114,7 @@ y_train = np.load(path.join(data_dir, "y_train.npy"))
 print(X_train.shape, X_test.shape, y_train.shape)
 
 trials = Trials()
-params = optimize(trials, X_train, y_train, 2)
+params = optimize(trials, X_train, y_train, 100)
 clf = get_model(params, X_train, y_train)
 dtest = xgb.DMatrix(X_test)
 preds = clf.predict(dtest)
