@@ -102,7 +102,7 @@ def optimize(trials, X, y, y_ix, reps, max_evals):
         'num_boost_round': hp.quniform('num_boost_round', 5, 50, 5),
         'eta': hp.quniform('eta', 0.1, 0.5, 0.1),
         'gamma': hp.quniform('gamma', 0, 1, 0.2),
-        'max_depth': hp.quniform('max_depth', 2, 8, 1),
+        'max_depth': hp.quniform('max_depth', 1, 6, 1),
         'min_child_weight': hp.quniform('min_child_weight', 1, 7, 2),
         'subsample': hp.quniform('subsample', 0.5, 1, 0.1),
         'colsample_bytree': hp.quniform('colsample_bytree', 0.5, 1, 0.1),
