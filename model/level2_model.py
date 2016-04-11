@@ -99,7 +99,7 @@ class Score:
 
 def optimize(trials, X, y, y_ix, reps, max_evals):
     space = {
-        'num_boost_round': hp.quniform('num_boost_round', 100, 300, 50),
+        'num_boost_round': hp.quniform('num_boost_round', 5, 50, 5),
         'eta': hp.quniform('eta', 0.1, 0.5, 0.1),
         'gamma': hp.quniform('gamma', 0, 1, 0.2),
         'max_depth': hp.quniform('max_depth', 2, 8, 1),
@@ -107,7 +107,6 @@ def optimize(trials, X, y, y_ix, reps, max_evals):
         'subsample': hp.quniform('subsample', 0.5, 1, 0.1),
         'colsample_bytree': hp.quniform('colsample_bytree', 0.5, 1, 0.1),
         'colsample_bylevel': hp.quniform('colsample_bylevel', 0.5, 1, 0.1),
-        'lambda': hp.loguniform('lambda', -0.7, 1.7),
         'silent': 1,
         'objective': 'binary:logistic'
     }
@@ -174,7 +173,7 @@ if __name__ == "__main__":
     X, y = get_data_train(data_dir, args)
 
     # save place
-    save_dir = "_".join(("../level2-model/" + str(args.yix) + "/" +
+    save_dir = "_".join(("../level2-models/" + str(args.yix) + "/" +
                          args.reps, args.prob, args.data))
     print(save_dir)
     if not path.exists(save_dir):
@@ -184,7 +183,7 @@ if __name__ == "__main__":
     y_ix = 0
     print("training for class " + str(args.yix))
     trials = Trials()
-    params = optimize(trials, X, y, y_ix, reps, 1)
+    params = optimize(trials, X, y, y_ix, reps, 50)
     preds = out_fold_pred(params, X, y, y_ix, reps)
     model = get_model(params, X, y, y_ix, reps)
     np.save(path.join(save_dir, "outFold.npy"), preds)
