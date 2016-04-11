@@ -20,6 +20,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel
 from sets import Set
+from utils import *
 
 np.random.seed(123213)
 
@@ -334,12 +335,6 @@ def get_sel_features(args, X_train, y_train):
     return sorted(feature_list)
 
 
-def ftr_pooling(x, args):
-    return np.array([np.mean(x[range(args.reps * i,
-                                     args.reps * i + args.reps)])
-                     for i in range(0, 2000)])
-
-
 args = parse_args()
 X_train, y_train = get_data_train(args)
 X_test, biz_list = get_data_test(args)
@@ -347,10 +342,18 @@ X_test, biz_list = get_data_test(args)
 X_train_new = get_new_train(args, X_train)
 X_test_new = get_new_test(args, X_test)
 feature_list = get_sel_features(args, X_train, y_train)
+print(args.data)
+print(feature_list)
+
+X_train_new = np.hstack((X_train_new, X_train[:, feature_list]))
+X_test_new = np.hstack((X_test_new, X_test[:, feature_list]))
 
 save_dir = "_".join(("../level2-feature/" + args.reps, args.prob,
                     args.data, str(args.yix)))
-os.mkdir(save_dir)
+
+if not path.exists(save_dir):
+    os.mkdir(save_dir)
 np.save(path.join(save_dir, "X_train.npy"), X_train_new)
+np.save(path.join(save_dir, "y_train.npy"), y_train)
 np.save(path.join(save_dir, "X_test.npy"), X_test_new)
 np.save(path.join(save_dir, "feature_list.npy"), feature_list)
