@@ -3,35 +3,35 @@
 
 source ~/.bashrc
 cd /home/yangyh/lixx3899/kaggle-yelp/model
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 0
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 1
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 2
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 3
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 4
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 5
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 6
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 7
-python lvl_1.py --data "21k" --prob "50"  --reps "5" --yix 8
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 0
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 1
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 2
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 3
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 4
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 5
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 6
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 7
+python level2_model.py --data "21k" --prob "50"  --reps "5" --yix 8
 
 
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 0
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 1
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 2
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 3
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 4
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 5
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 6
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 7
-python lvl_1.py --data "v3" --prob "50"  --reps "5" --yix 8
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 0
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 1
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 2
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 3
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 4
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 5
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 6
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 7
+python level2_model.py --data "v3" --prob "50"  --reps "5" --yix 8
 
 
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 0
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 1
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 2
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 3
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 4
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 5
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 6
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 7
-python lvl_1.py --data "colHist" --prob "50"  --reps "5" --yix 8
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 0
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 1
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 2
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 3
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 4
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 5
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 6
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 7
+python level2_model.py --data "colHist" --prob "50"  --reps "5" --yix 8
 
