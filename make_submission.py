@@ -31,8 +31,6 @@ for y_ix in range(9):
     pred_path = path.join(args.output_dir, str(y_ix), "pred.npy")
     pred = np.load(pred_path) > 0.5
     pred_list.append(pred)
-    if y_ix == 1:
-        break
 
 preds = np.array(pred_list)
 preds_cls = binarize(X=preds, threshold=0.5, copy=True).T
