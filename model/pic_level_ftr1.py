@@ -66,17 +66,18 @@ biz_list = photo2biz['business_id'].unique()
 result_list = []
 for biz_id in biz_list:
     photo_ids = photo2biz[photo2biz['business_id'] == biz_id].index.values
+    print(biz_id, len(photo_ids))
     preds = img_feature_df.loc[photo_ids, :].as_matrix()
     ft = np.apply_along_axis(agg_function, 0, preds).flatten(order='F')
     print(ft.shape)
     result_list.append(ft)
 
-result_array = np.asarray(result_list).T
+result_array = np.asarray(result_list)
 np.save(path.join(save_dir, 'train.npy'), result_array)
 
 
 # for test data
-X_test = np.load('pic_test.npy')[:, -3:]
+X_test = np.load(path.join(data_dir, 'pic_test.npy'))[:, -3:]
 
 img_df = pd.read_csv('../data/imglist_test.txt', sep='\t', header=None)
 img_index = img_df.ix[:, 0].as_matrix()
@@ -90,10 +91,11 @@ biz_list = photo2biz['business_id'].unique()
 result_list = []
 for biz_id in biz_list:
     photo_ids = photo2biz[photo2biz['business_id'] == biz_id].index.values
+    print(biz_id, len(photo_ids))
     preds = img_feature_df.loc[photo_ids, :].as_matrix()
     ft = np.apply_along_axis(agg_function, 0, preds).flatten(order='F')
     print(ft.shape)
     result_list.append(ft)
 
-result_array = np.asarray(result_list).T
+result_array = np.asarray(result_list)
 np.save(path.join(save_dir, 'test.npy'), result_array)
