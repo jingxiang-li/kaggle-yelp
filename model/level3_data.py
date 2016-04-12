@@ -36,7 +36,7 @@ models_lvl2_path = "../level2-models/" + str(args.yix)
 
 X_train_next_list = []
 X_test_next_list = []
-for model_dir in listdir(models_lvl2_path):
+for model_dir in sorted(listdir(models_lvl2_path)):
     dir_path = path.join(models_lvl2_path, model_dir)
     reps, prob, data = parse_dir_name(model_dir)
     # get model
