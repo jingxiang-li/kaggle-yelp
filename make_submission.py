@@ -13,6 +13,7 @@ import datetime
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output_dir', type=str, default="level3-models/")
+    parser.add_argument('--out_ix', type=str, default="1")
     return parser.parse_args()
 
 
@@ -29,7 +30,8 @@ def parse_class(preds_cls):
 args = parse_args()
 pred_list = []
 for y_ix in range(9):
-    pred_path = path.join(args.output_dir, str(y_ix), "pred.npy")
+    pred_path = path.join(
+        args.output_dir, str(y_ix), "pred" + args.out_ix + ".npy")
     pred = np.load(pred_path) > 0.5
     pred_list.append(pred)
 

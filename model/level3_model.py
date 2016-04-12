@@ -25,6 +25,7 @@ np.random.seed(6796)
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--yix', type=int, default=0)
+    parser.add_argument('--out_ix', type=str, default="1")
     return parser.parse_args()
 
 
@@ -188,4 +189,4 @@ print(save_dir)
 if not path.exists(save_dir):
     os.makedirs(save_dir)
 
-np.save(path.join(save_dir, "pred.npy"), preds)
+np.save(path.join(save_dir, "pred" + args.out_ix + ".npy"), preds)
