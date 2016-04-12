@@ -11,6 +11,7 @@ import os
 from utils import *
 import pickle
 
+from sklearn.cross_validation import StratifiedKFold
 
 np.random.seed(888)
 
@@ -45,3 +46,30 @@ with open('../level4-model/' + str(args.yix) + '/param.pkl', 'rb') as f:
 
 print(X_train.shape, X_test.shape, y_train.shape, y_test_init.shape)
 print(params)
+
+y_test_prob = y_test_init
+y_test_class = (y_test_init > 0.5).astype(int)
+
+for replication in range(10):
+    for train_ix, test_ix in StratifiedKFold(y_test_class,
+                                             n_fold=5,
+                                             shuffle=True):
+        X = np.vstack((X_train, X_test[train_ix, :]))
+        y = np.hstack((y_train, y_test_class[train_ix]))
+        dtrain = xgb.DMatrix(X, y)
+        bst = xgb.train(params=params,
+                        dtrain=dtrain,
+                        num_boost_round=params['num_boost_round'])
+        dtest = xgb.DMatrix(X_test[test_is, :])
+        pred = bst.predict(dtest)
+        y_test_prob[test_ix] = pred
+        y_test_class[test_ix] = (pred > 0.5).astype(int)
+        print(np.sum((y_test_prob - y_test_init) ** 2))
+
+
+save_dir = '../semi/' + str(args.yix)
+print(save_dir)
+if not path.exists(save_dir):
+    os.makedirs(save_dir)
+
+np.save(path.join(save_dir, 'pred.npy'), y_test_prob)
