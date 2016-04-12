@@ -13,6 +13,7 @@ from os import path
 import os
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from utils import *
+import pickle
 
 np.random.seed(54568464)
 
