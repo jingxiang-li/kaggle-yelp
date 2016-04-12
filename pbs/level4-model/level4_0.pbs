@@ -1,0 +1,9 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=24,mem=32gb
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp/model
+
+python level4_model.py --yix 3
+python level4_model.py --yix 4
+python level4_model.py --yix 5
