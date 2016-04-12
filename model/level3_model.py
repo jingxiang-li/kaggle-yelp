@@ -10,6 +10,13 @@ from os import path
 import os
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.decomposition import PCA
+from sklearn.decomposition import FastICA
+from sklearn.pipeline import make_pipeline, make_union
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
 from utils import *
 
 np.random.seed(6796)
@@ -105,12 +112,69 @@ def get_model(params, X, y):
                     verbose_eval=None)
     return bst
 
+# extra features
+
+
+class selectKFromModel:
+    def __init__(self, estimator, k, prefit=False):
+        self.estimator = estimator
+        self.prefit = prefit
+        self.k = k
+
+    def fit(self, X, y=None, **fit_params):
+        if self.prefit is False:
+            self.estimator.fit(X, y, **fit_params)
+        self.importances = self.estimator.feature_importances_
+        self.indices = np.argsort(self.importances)[::-1][:self.k]
+        return self
+
+    def transform(self, X):
+        return X[:, self.indices]
+
+
+def get_extra_features(args):
+    forest = ExtraTreesClassifier(n_estimators=2000,
+                                  criterion='entropy',
+                                  max_features='sqrt',
+                                  max_depth=6,
+                                  min_samples_split=8,
+                                  n_jobs=-1,
+                                  bootstrap=True,
+                                  oob_score=True,
+                                  verbose=1,
+                                  class_weight='balanced')
+    pca = PCA(n_components=200)
+    ica = FastICA(n_components=200, max_iter=1000)
+    kmeans = KMeans(n_clusters=200, n_init=20, max_iter=1000)
+
+    pipeline = make_pipeline(selectKFromModel(forest, k=1000),
+                             StandardScaler(),
+                             make_union(pca, ica, kmeans))
+
+    X_train = np.load("../feature/1_100/X_train.npy")
+    y_train = np.load("../feature/1_100/y_train.npy")
+    X_test = np.load("../feature/1_100/X_test.npy")
+
+    pipeline.fit(X_train, y_train[:, args.yix])
+    sel_ixs = pipeline.steps[0][1].indices[:400]
+    X_train_ext = np.hstack((pipeline.transform(X_train), X_train[:, sel_ixs]))
+    X_test_ext = np.hstack((pipeline.transform(X_test), X_test[:, sel_ixs]))
+    return X_train_ext, X_test_ext
+
 
 args = parse_args()
 data_dir = "../level3-feature/" + str(args.yix)
 X_train = np.load(path.join(data_dir, "X_train.npy"))
 X_test = np.load(path.join(data_dir, "X_test.npy"))
 y_train = np.load(path.join(data_dir, "y_train.npy"))
+print(X_train.shape, X_test.shape, y_train.shape)
+
+X_train_ext, X_test_ext = get_extra_features(args)
+print(X_train_ext.shape, X_test_ext.shape)
+
+X_train = np.hstack((X_train, X_train_ext))
+X_test = np.hstack((X_test, X_test_ext))
+print("Add Extra")
 print(X_train.shape, X_test.shape, y_train.shape)
 
 trials = Trials()
