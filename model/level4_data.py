@@ -55,8 +55,8 @@ X_test_pred = np.vstack((
 X_train_all = np.hstack((X_train, X_train_pred))
 X_test_all = np.hstack((X_test, X_test_pred))
 
-print(X_train.shape)
-print(X_test.shape)
+print(X_train_all.shape)
+print(X_train_all.shape)
 
 save_dir = path.join("../level4-feature/" + str(args.yix))
 if not path.exists(save_dir):
