@@ -55,7 +55,7 @@ class level2_pred:
             clf = pickle.load(f)
 
         d_input = xgb.DMatrix(X_input)
-        return clf.predict(d_input, output_margin=False)
+        return np.asarray(clf.predict(d_input, output_margin=False)).T
 
 
 X = np.load('../feature/1_100/X_train.npy')
