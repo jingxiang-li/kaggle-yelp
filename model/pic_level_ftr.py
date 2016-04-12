@@ -8,13 +8,30 @@ import argparse
 import os
 from os import path
 
-from predict import get_level4_features, selectKFromModel
+from predict import get_level4_features
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--yix', type=int, default=0)
     return parser.parse_args()
+
+
+class selectKFromModel:
+    def __init__(self, estimator, k, prefit=False):
+        self.estimator = estimator
+        self.prefit = prefit
+        self.k = k
+
+    def fit(self, X, y=None, **fit_params):
+        if self.prefit is False:
+            self.estimator.fit(X, y, **fit_params)
+        self.importances = self.estimator.feature_importances_
+        self.indices = np.argsort(self.importances)[::-1][:self.k]
+        return self
+
+    def transform(self, X):
+        return X[:, self.indices]
 
 
 def agg_function(x):
