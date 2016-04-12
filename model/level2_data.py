@@ -335,25 +335,30 @@ def get_sel_features(args, X_train, y_train):
     return sorted(feature_list)
 
 
-args = parse_args()
-X_train, y_train = get_data_train(args)
-X_test, biz_list = get_data_test(args)
+def main():
+    args = parse_args()
+    X_train, y_train = get_data_train(args)
+    X_test, biz_list = get_data_test(args)
 
-X_train_new = get_new_train(args, X_train)
-X_test_new = get_new_test(args, X_test)
-feature_list = get_sel_features(args, X_train, y_train)
-print(args.data)
-print(feature_list)
+    X_train_new = get_new_train(args, X_train)
+    X_test_new = get_new_test(args, X_test)
+    feature_list = get_sel_features(args, X_train, y_train)
+    print(args.data)
+    print(feature_list)
 
-X_train_new = np.hstack((X_train_new, X_train[:, feature_list]))
-X_test_new = np.hstack((X_test_new, X_test[:, feature_list]))
+    X_train_new = np.hstack((X_train_new, X_train[:, feature_list]))
+    X_test_new = np.hstack((X_test_new, X_test[:, feature_list]))
 
-save_dir = "_".join(("../level2-feature/" + str(args.yix) + "/" +
-                     args.reps, args.prob, args.data))
+    save_dir = "_".join(("../level2-feature/" + str(args.yix) + "/" +
+                         args.reps, args.prob, args.data))
 
-if not path.exists(save_dir):
-    os.makedirs(save_dir)
-np.save(path.join(save_dir, "X_train.npy"), X_train_new)
-np.save(path.join(save_dir, "y_train.npy"), y_train)
-np.save(path.join(save_dir, "X_test.npy"), X_test_new)
-np.save(path.join(save_dir, "feature_list.npy"), feature_list)
+    if not path.exists(save_dir):
+        os.makedirs(save_dir)
+    np.save(path.join(save_dir, "X_train.npy"), X_train_new)
+    np.save(path.join(save_dir, "y_train.npy"), y_train)
+    np.save(path.join(save_dir, "X_test.npy"), X_test_new)
+    np.save(path.join(save_dir, "feature_list.npy"), feature_list)
+
+
+if __name__ == "__main__":
+    main()
