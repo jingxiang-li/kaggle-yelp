@@ -9,23 +9,15 @@ import argparse
 from os import path
 import os
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.decomposition import PCA
-from sklearn.decomposition import FastICA
-from sklearn.pipeline import make_pipeline, make_union
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-
 from utils import *
+import pickle
 
-np.random.seed(6796)
+np.random.seed(345345)
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--yix', type=int, default=0)
-    parser.add_argument('--out_ix', type=str, default="1")
     return parser.parse_args()
 
 
@@ -51,11 +43,11 @@ class Score:
         self.dtrain = xgb.DMatrix(X, label=y)
 
     def get_score(self, params):
-        params["max_depth"] = int(params["max_depth"])
-        params["min_child_weight"] = int(params["min_child_weight"])
-        params["num_boost_round"] = int(params["num_boost_round"])
+        params['max_depth'] = int(params['max_depth'])
+        params['min_child_weight'] = int(params['min_child_weight'])
+        params['num_boost_round'] = int(params['num_boost_round'])
 
-        print("Training with params:")
+        print('Training with params:')
         print(params)
 
         cv_result = xgb.cv(params=params,
@@ -75,7 +67,7 @@ class Score:
 
 def optimize(trials, X, y, max_evals):
     space = {
-        'num_boost_round': hp.quniform('num_boost_round', 5, 100, 5),
+        'num_boost_round': hp.quniform('num_boost_round', 10, 200, 10),
         'eta': hp.quniform('eta', 0.1, 0.3, 0.1),
         'gamma': hp.quniform('gamma', 0, 1, 0.2),
         'max_depth': hp.quniform('max_depth', 1, 6, 1),
@@ -91,11 +83,32 @@ def optimize(trials, X, y, max_evals):
                 trials=trials,
                 max_evals=max_evals
                 )
-    best["max_depth"] = int(best["max_depth"])
-    best["min_child_weight"] = int(best["min_child_weight"])
-    best["num_boost_round"] = int(best["num_boost_round"])
+    best['max_depth'] = int(best['max_depth'])
+    best['min_child_weight'] = int(best['min_child_weight'])
+    best['num_boost_round'] = int(best['num_boost_round'])
     del s
     return best
+
+
+def out_fold_pred(params, X, y, reps):
+    preds = np.zeros((y.shape[0]))
+    params['silent'] = 1
+    params['objective'] = 'binary:logistic'
+    params['scale_pos_weight'] = float(np.sum(y == 0)) / np.sum(y == 1)
+    for train_ix, test_ix in makeKFold(5, y, reps):
+        X_train, X_test = X[train_ix, :], X[test_ix, :]
+        y_train = y[train_ix]
+        dtrain = xgb.DMatrix(X_train, label=y_train)
+        dtest = xgb.DMatrix(X_test)
+        bst = xgb.train(params=params,
+                        dtrain=dtrain,
+                        num_boost_round=params['num_boost_round'],
+                        evals=[(dtrain, 'train')],
+                        feval=evalF1,
+                        maximize=True,
+                        verbose_eval=None)
+        preds[test_ix] = bst.predict(dtest)
+    return preds
 
 
 def get_model(params, X, y):
@@ -113,80 +126,42 @@ def get_model(params, X, y):
                     verbose_eval=None)
     return bst
 
-# extra features
-
-
-class selectKFromModel:
-    def __init__(self, estimator, k, prefit=False):
-        self.estimator = estimator
-        self.prefit = prefit
-        self.k = k
-
-    def fit(self, X, y=None, **fit_params):
-        if self.prefit is False:
-            self.estimator.fit(X, y, **fit_params)
-        self.importances = self.estimator.feature_importances_
-        self.indices = np.argsort(self.importances)[::-1][:self.k]
-        return self
-
-    def transform(self, X):
-        return X[:, self.indices]
-
-
-def get_extra_features(args):
-    forest = RandomForestClassifier(n_estimators=1000,
-                                    criterion='entropy',
-                                    max_features='sqrt',
-                                    max_depth=6,
-                                    min_samples_split=8,
-                                    n_jobs=-1,
-                                    bootstrap=True,
-                                    oob_score=True,
-                                    verbose=1,
-                                    class_weight='balanced')
-    pca = PCA(n_components=200)
-    ica = FastICA(n_components=200, max_iter=1000)
-    kmeans = KMeans(n_clusters=300, n_init=20, max_iter=1000)
-
-    pipeline = make_pipeline(selectKFromModel(forest, k=1000),
-                             StandardScaler(),
-                             make_union(pca, ica, kmeans))
-
-    X_train = np.load("../feature/1_100/X_train.npy")
-    y_train = np.load("../feature/1_100/y_train.npy")
-    X_test = np.load("../feature/1_100/X_test.npy")
-
-    pipeline.fit(X_train, y_train[:, args.yix])
-    sel_ixs = pipeline.steps[0][1].indices[:500]
-    X_train_ext = np.hstack((pipeline.transform(X_train), X_train[:, sel_ixs]))
-    X_test_ext = np.hstack((pipeline.transform(X_test), X_test[:, sel_ixs]))
-    return X_train_ext, X_test_ext
-
 
 args = parse_args()
-data_dir = "../level3-feature/" + str(args.yix)
-X_train = np.load(path.join(data_dir, "X_train.npy"))
-X_test = np.load(path.join(data_dir, "X_test.npy"))
-y_train = np.load(path.join(data_dir, "y_train.npy"))
+data_dir = '../level3-feature/' + str(args.yix)
+X_train = np.load(path.join(data_dir, 'X_train.npy'))
+X_test = np.load(path.join(data_dir, 'X_test.npy'))
+y_train = np.load(path.join(data_dir, 'y_train.npy'))
 print(X_train.shape, X_test.shape, y_train.shape)
 
-X_train_ext, X_test_ext = get_extra_features(args)
+X_train_ext = np.load('../extra_ftrs/' + str(args.yix) + '/X_train_ext.npy')
+X_test_ext = np.load('../extra_ftrs/' + str(args.yix) + '/X_test_ext.npy')
 print(X_train_ext.shape, X_test_ext.shape)
 
 X_train = np.hstack((X_train, X_train_ext))
 X_test = np.hstack((X_test, X_test_ext))
-print("Add Extra")
+print('Add Extra')
 print(X_train.shape, X_test.shape, y_train.shape)
 
 trials = Trials()
 params = optimize(trials, X_train, y_train, 100)
+out_fold = out_fold_pred(params, X_train, y_train, 1)
 clf = get_model(params, X_train, y_train)
+
 dtest = xgb.DMatrix(X_test)
 preds = clf.predict(dtest)
 
-save_dir = "../level3-models/" + str(args.yix)
+save_dir = '../level3-model-final/' + str(args.yix)
 print(save_dir)
 if not path.exists(save_dir):
     os.makedirs(save_dir)
 
-np.save(path.join(save_dir, "pred" + args.out_ix + ".npy"), preds)
+# save model, parameter, outFold_pred, pred
+with open(path.join(save_dir, 'model.pkl'), 'wb') as f_model:
+    pickle.dump(clf, f_model)
+
+with open(path.join(save_dir, 'param.pkl'), 'wb') as f_param:
+    pickle.dump(params, f_param)
+
+np.save(path.join(save_dir, 'pred.npy'), preds)
+np.save(path.join(save_dir, 'outFold.npy'), out_fold)
