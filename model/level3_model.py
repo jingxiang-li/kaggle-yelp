@@ -10,7 +10,7 @@ from os import path
 import os
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
-from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 from sklearn.pipeline import make_pipeline, make_union
@@ -74,7 +74,7 @@ class Score:
 
 def optimize(trials, X, y, max_evals):
     space = {
-        'num_boost_round': hp.quniform('num_boost_round', 10, 200, 10),
+        'num_boost_round': hp.quniform('num_boost_round', 5, 100, 5),
         'eta': hp.quniform('eta', 0.1, 0.3, 0.1),
         'gamma': hp.quniform('gamma', 0, 1, 0.2),
         'max_depth': hp.quniform('max_depth', 1, 6, 1),
@@ -133,19 +133,19 @@ class selectKFromModel:
 
 
 def get_extra_features(args):
-    forest = ExtraTreesClassifier(n_estimators=2000,
-                                  criterion='entropy',
-                                  max_features='sqrt',
-                                  max_depth=6,
-                                  min_samples_split=8,
-                                  n_jobs=-1,
-                                  bootstrap=True,
-                                  oob_score=True,
-                                  verbose=1,
-                                  class_weight='balanced')
+    forest = RandomForestClassifier(n_estimators=1000,
+                                    criterion='entropy',
+                                    max_features='sqrt',
+                                    max_depth=6,
+                                    min_samples_split=8,
+                                    n_jobs=-1,
+                                    bootstrap=True,
+                                    oob_score=True,
+                                    verbose=1,
+                                    class_weight='balanced')
     pca = PCA(n_components=200)
     ica = FastICA(n_components=200, max_iter=1000)
-    kmeans = KMeans(n_clusters=200, n_init=20, max_iter=1000)
+    kmeans = KMeans(n_clusters=300, n_init=20, max_iter=1000)
 
     pipeline = make_pipeline(selectKFromModel(forest, k=1000),
                              StandardScaler(),
@@ -156,7 +156,7 @@ def get_extra_features(args):
     X_test = np.load("../feature/1_100/X_test.npy")
 
     pipeline.fit(X_train, y_train[:, args.yix])
-    sel_ixs = pipeline.steps[0][1].indices[:400]
+    sel_ixs = pipeline.steps[0][1].indices[:500]
     X_train_ext = np.hstack((pipeline.transform(X_train), X_train[:, sel_ixs]))
     X_test_ext = np.hstack((pipeline.transform(X_test), X_test[:, sel_ixs]))
     return X_train_ext, X_test_ext
