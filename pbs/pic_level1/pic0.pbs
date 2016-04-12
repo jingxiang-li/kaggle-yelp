@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=16,mem=32gb
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp/model
+python pic_level_ftr1.py --yix 0
+python pic_level_ftr1.py --yix 1
+python pic_level_ftr1.py --yix 2
+# python pic_level_ftr1.py --yix 3
+# python pic_level_ftr1.py --yix 4
+# python pic_level_ftr1.py --yix 5
+# python pic_level_ftr1.py --yix 6
+# python pic_level_ftr1.py --yix 7
+# python pic_level_ftr1.py --yix 8
