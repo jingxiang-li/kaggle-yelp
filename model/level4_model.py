@@ -73,7 +73,7 @@ class Score:
                                 X=self.X,
                                 y=self.y,
                                 scoring='f1',
-                                cv=StratifiedKFold(y, 5, True),
+                                cv=StratifiedKFold(self.y, 5, True),
                                 n_jobs=-1,
                                 verbose=1)
         print(score)
