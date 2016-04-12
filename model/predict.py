@@ -59,18 +59,93 @@ class level2_pred:
         return result.reshape((result.size, 1))
 
 
+class selectKFromModel:
+    def __init__(self, estimator, k, prefit=False):
+        self.estimator = estimator
+        self.prefit = prefit
+        self.k = k
+
+    def fit(self, X, y=None, **fit_params):
+        if self.prefit is False:
+            self.estimator.fit(X, y, **fit_params)
+        self.importances = self.estimator.feature_importances_
+        self.indices = np.argsort(self.importances)[::-1][:self.k]
+        return self
+
+    def transform(self, X):
+        return X[:, self.indices]
+
+
+class level3_extra:
+    def __init__(self, yix):
+        self.args = Namespace(yix=yix)
+
+    def transform(self, X):
+        with open('../extra_ftrs/' + str(self.args.yix) +
+                  '/pipe.pkl', 'rb') as f_pipe:
+            pipeline = pickle.load(f_pipe)
+        sel_ix = np.load('../extra_ftrs/' + str(self.args.yix) + '/selix.npy')
+        print(pipeline)
+        print(sel_ix)
+        X_0 = pipeline.transform(X)
+        X_1 = X[:, sel_ix]
+        return np.hstack((X_0, X_1))
+
+
+class level3_pred:
+    def __init__(self, yix):
+        self.args = Namespace(yix=yix)
+
+    def transform(self, X):
+        with open('../level3-model-final/' + str(self.args.yix) +
+                  '/model.pkl', 'rb') as f:
+            bst = pickle.load(f)
+
+        with open('./level3-model-final/' + str(self.args.yix) +
+                  '/model_rf.pkl', 'rb') as f:
+            rf = pickle.load(f)
+
+        with open('./level3-model-final/' + str(self.args.yix) +
+                  '/model_ext.pkl', 'rb') as f:
+            ext = pickle.load(f)
+
+        d_X = xgb.DMatrix(X)
+        pred_bst = bst.predict(d_X)
+
+        pred_list_rf = []
+        for clf in rf:
+            pred_list_rf.append(clf.predict_proba(X)[:, 1])
+        pred_rf = np.mean(np.array(pred_list_rf), axis=0)
+
+        pred_list_ext = []
+        for clf in ext:
+            pred_list_ext.append(clf.predict_proba(X)[:, 1])
+        pred_ext = np.mean(np.array(pred_list_ext), axis=0)
+
+        return np.vstack((
+            pred_bst,
+            pred_rf,
+            pred_ext)).T
+
 X = np.load('../feature/1_100/X_train.npy')
 
 global_args = parse_args()
-data_ch = ['21k', 'v3', 'colHist']
-prob_ch = ['75', '50']
+data_ch = ['21k', 'colHist', 'v3']
+prob_ch = ['50', '75']
 reps_ch = ['5', '9']
 lvl2_trans = []
-for data in data_ch:
+for reps in reps_ch:
     for prob in prob_ch:
-        for reps in reps_ch:
+        for data in data_ch:
+            print(reps, prob, data)
             lvl2_trans.append(level2_pred(data, prob, reps, global_args.yix))
 print(lvl2_trans)
 
 lvl2_pred = make_union(*lvl2_trans)
-print(lvl2_pred.transform(X).shape)
+X_lvl2_pred = lvl2_pred.transform(X)
+X_lvl3_extra = level3_extra(global_args.yix).transform(X)
+X_lvl3_pred = level3_pred().transform(np.hstack(X_lvl2_pred, X_lvl3_extra))
+
+print(X_lvl2_pred.shape)
+print(X_lvl3_extra.shape)
+print(X_lvl3_pred.shape)
