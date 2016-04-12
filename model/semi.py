@@ -39,8 +39,8 @@ def get_data(args):
 
 args = parse_args()
 X_train, X_test, y_train = get_data(args)
-y_test_init = np.load('../level4-model/' + str(args.yix) + 'pred.npy')
-with open('../level4-model/' + str(args.yix) + 'param.pkl', 'rb') as f:
+y_test_init = np.load('../level4-model/' + str(args.yix) + '/pred.npy')
+with open('../level4-model/' + str(args.yix) + '/param.pkl', 'rb') as f:
     params = pickle.load(f)
 
 print(X_train.shape, X_test.shape, y_train.shape, y_test_init.shape)
