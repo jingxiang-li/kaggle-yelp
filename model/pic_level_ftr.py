@@ -50,10 +50,9 @@ feature_21k = np.load('../feature/inception-21k-train.npy')
 feature_colHist = np.load('../feature/colHist-train.npy')
 feature_v3 = np.load('../feature/inception-v3-train.npy')
 
-ft_raw = np.hstack((feature_21k, feature_colHist, feature_v3))
-print(ft_raw.shape)
-ft_raw = np.hstack((ft_raw, np.zeros((ft_raw.shape[0], 3458))))
-
+ft_raw_tmp = np.hstack((feature_21k, feature_colHist, feature_v3))
+print(ft_raw_tmp.shape)
+ft_raw = np.hstack((ft_raw_tmp, np.zeros((ft_raw_tmp.shape[0], 3458))))
 print(ft_raw.shape)
 ft_lvl4 = get_level4_features(ft_raw, args)
 print(ft_lvl4.shape)
