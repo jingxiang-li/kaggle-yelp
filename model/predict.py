@@ -8,10 +8,9 @@ from __future__ import unicode_literals
 import numpy as np
 import argparse
 from os import path
-#import os
-#import re
 import pickle
 import xgboost as xgb
+
 from sklearn.pipeline import make_pipeline, make_union
 
 from level2_data import get_new_test
@@ -128,7 +127,7 @@ class level3_pred:
             pred_ext)).T
 
 
-def get_level3_features(X, global_args):
+def get_level4_features(X, global_args):
     data_ch = ['21k', 'colHist', 'v3']
     prob_ch = ['50', '75']
     reps_ch = ['5', '9']
@@ -149,8 +148,8 @@ def get_level3_features(X, global_args):
     return np.hstack((X_lvl2_pred, X_lvl3_extra, X_lvl3_pred))
 
 
-X = np.load('../feature/1_100/X_train.npy')
-global_args = parse_args()
+# X = np.load('../feature/1_100/X_train.npy')
+# global_args = parse_args()
 
-X_new = get_level3_features(X, global_args)
-print(X_new.shape)
+# X_new = get_level3_features(X, global_args)
+# print(X_new.shape)
