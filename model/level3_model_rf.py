@@ -148,7 +148,7 @@ out_fold = out_fold_pred(params, X_train, y_train)
 clf = get_model(params, X_train, y_train)
 preds = clf.predict_proba(X_test)[:, 1]
 
-save_dir = '../level3-models/' + str(args.yix)
+save_dir = '../level3-model-final/' + str(args.yix)
 print(save_dir)
 if not path.exists(save_dir):
     os.makedirs(save_dir)
