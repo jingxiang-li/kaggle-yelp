@@ -12,8 +12,8 @@ import datetime
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--output_dir', type=str, default="level3-models/")
-    parser.add_argument('--out_ix', type=str, default="1")
+    parser.add_argument('--output_dir', type=str, default="level4-model/")
+    parser.add_argument('--out_ix', type=str, default="")
     return parser.parse_args()
 
 
