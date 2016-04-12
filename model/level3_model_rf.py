@@ -136,7 +136,7 @@ X_test_ext = np.load('../extra_ftrs/' + str(args.yix) + '/X_test_ext.npy')
 print(X_train_ext.shape, X_test_ext.shape)
 
 X_train = np.hstack((X_train, X_train_ext))
-X_test = np.hstack((X_train, X_test_ext))
+X_test = np.hstack((X_test, X_test_ext))
 print('Add Extra')
 print(X_train.shape, X_test.shape, y_train.shape)
 
