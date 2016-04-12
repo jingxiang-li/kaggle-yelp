@@ -127,26 +127,30 @@ class level3_pred:
             pred_rf,
             pred_ext)).T
 
+
+def get_level3_features(X, global_args):
+    data_ch = ['21k', 'colHist', 'v3']
+    prob_ch = ['50', '75']
+    reps_ch = ['5', '9']
+    lvl2_trans = []
+    for reps in reps_ch:
+        for prob in prob_ch:
+            for data in data_ch:
+                print(reps, prob, data)
+                lvl2_trans.append(
+                    level2_pred(data, prob, reps, global_args.yix))
+    print(lvl2_trans)
+
+    lvl2_pred = make_union(*lvl2_trans)
+    X_lvl2_pred = lvl2_pred.transform(X)
+    X_lvl3_extra = level3_extra(global_args.yix).transform(X)
+    X_lvl3_pred = level3_pred(global_args.yix).transform(
+        np.hstack((X_lvl2_pred, X_lvl3_extra)))
+    return np.hstack((X_lvl2_pred, X_lvl3_extra, X_lvl3_pred))
+
+
 X = np.load('../feature/1_100/X_train.npy')
-
 global_args = parse_args()
-data_ch = ['21k', 'colHist', 'v3']
-prob_ch = ['50', '75']
-reps_ch = ['5', '9']
-lvl2_trans = []
-for reps in reps_ch:
-    for prob in prob_ch:
-        for data in data_ch:
-            print(reps, prob, data)
-            lvl2_trans.append(level2_pred(data, prob, reps, global_args.yix))
-print(lvl2_trans)
 
-lvl2_pred = make_union(*lvl2_trans)
-X_lvl2_pred = lvl2_pred.transform(X)
-X_lvl3_extra = level3_extra(global_args.yix).transform(X)
-X_lvl3_pred = level3_pred(global_args.yix).transform(
-    np.hstack((X_lvl2_pred, X_lvl3_extra)))
-
-print(X_lvl2_pred.shape)
-print(X_lvl3_extra.shape)
-print(X_lvl3_pred.shape)
+X_new = get_level3_features(X, global_args)
+print(X_new.shape)
