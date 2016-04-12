@@ -144,7 +144,7 @@ print(X_train.shape, X_test.shape, y_train.shape)
 
 # Now we have X_train, X_test, y_train
 trials = Trials()
-params = optimize(trials, X_train, y_train, 80)
+params = optimize(trials, X_train, y_train, 50)
 out_fold = out_fold_pred(params, X_train, y_train)
 clf = get_model(params, X_train, y_train)
 preds = clf.predict_proba(X_test)[:, 1]
