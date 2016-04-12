@@ -39,6 +39,10 @@ def agg_function(x):
                             np.sum(x > 0.4),
                             np.sum(x > 0.35),
                             np.sum(x > 0.3),
+                            np.sum(x > 0.25),
+                            np.sum(x > 0.2),
+                            np.sum(x > 0.15),
+                            np.sum(x > 0.1),
                             x.size]))
 
 
