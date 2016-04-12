@@ -70,7 +70,10 @@ def get_extra_features(args):
 
 
 args = parse_args()
+print(args.yix)
+
 X_train_ext, X_test_ext = get_extra_features(args)
+
 save_dir = "extra_ftrs/" + str(args.yix)
 print(save_dir)
 if not path.exists(save_dir):
