@@ -73,7 +73,7 @@ class Score:
                                 X=self.X,
                                 y=self.y,
                                 scoring='f1',
-                                cv=StratifiedKFold(self.y, 5, True),
+                                cv=StratifiedKFold(self.y, 4, True),
                                 n_jobs=-1,
                                 verbose=1)
         print(score)
@@ -148,7 +148,7 @@ X_test_all = np.hstack((X_test, X_test_pic))
 print(X_train_all.shape, X_test_all.shape)
 
 trials = Trials()
-params = optimize(trials, X_train_all, y_train, 100)
+params = optimize(trials, X_train_all, y_train, 30)
 model = get_model(params, X_train_all, y_train)
 preds = model.predict_proba(X_test_all)[:, 1]
 
