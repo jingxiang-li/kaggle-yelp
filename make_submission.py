@@ -7,6 +7,7 @@ import numpy as np
 import argparse
 from os import path, makedirs
 from sklearn.preprocessing import binarize
+import datetime
 
 
 def parse_args():
@@ -42,7 +43,9 @@ output_dir = "output"
 if not path.exists(output_dir):
     makedirs(output_dir)
 
-with open(path.join(output_dir, "submission.csv"), "w") as fout:
+now = datetime.datetime.now().strftime(r"%b-%d-%H-%M")
+
+with open(path.join(output_dir, "submission-" + now + ".csv"), "w") as fout:
     fout.write("business_id,labels\n")
     for biz_id, pred in zip(biz_list, preds_cls_idx):
         fout.write(biz_id + "," + pred + "\n")
