@@ -20,15 +20,13 @@ def parse_args():
     parser.add_argument('--yix', type=int, default=0)
     return parser.parse_args()
 
-# functions for xgboost training
 
+# functions for xgboost training
 
 def evalF1(preds, dtrain):
     from sklearn.metrics import f1_score
     labels = dtrain.get_label()
-    y_agg = labels[range(0, labels.shape[0], reps)]
-    pred_agg = agg_preds(preds, reps, vote_by_majority)
-    return 'f1-score', f1_score(y_agg, pred_agg)
+    return 'f1-score', f1_score(labels, preds > 0.5)
 
 
 def fpreproc(dtrain, dtest, param):
