@@ -144,7 +144,7 @@ print(lvl2_trans)
 lvl2_pred = make_union(*lvl2_trans)
 X_lvl2_pred = lvl2_pred.transform(X)
 X_lvl3_extra = level3_extra(global_args.yix).transform(X)
-X_lvl3_pred = level3_pred().transform(np.hstack(X_lvl2_pred, X_lvl3_extra))
+X_lvl3_pred = level3_pred(global_args.yix).transform(np.hstack(X_lvl2_pred, X_lvl3_extra))
 
 print(X_lvl2_pred.shape)
 print(X_lvl3_extra.shape)
