@@ -12,11 +12,7 @@ from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from utils import *
 import pickle
 
-from sklearn.pipeline import make_pipeline
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.cross_validation import cross_val_score, StratifiedKFold
-
-np.random.seed(545648)
+np.random.seed(666)
 
 
 def parse_args():
@@ -24,74 +20,63 @@ def parse_args():
     parser.add_argument('--yix', type=int, default=0)
     return parser.parse_args()
 
+# functions for xgboost training
 
-class selectKFromModel:
-    def __init__(self, estimator, k, prefit=False):
-        self.estimator = estimator
-        self.prefit = prefit
-        self.k = k
 
-    def fit(self, X, y=None, **fit_params):
-        if self.prefit is False:
-            self.estimator.fit(X, y, **fit_params)
-        self.importances = self.estimator.feature_importances_
-        self.indices = np.argsort(self.importances)[::-1][:self.k]
-        return self
+def evalF1(preds, dtrain):
+    from sklearn.metrics import f1_score
+    labels = dtrain.get_label()
+    y_agg = labels[range(0, labels.shape[0], reps)]
+    pred_agg = agg_preds(preds, reps, vote_by_majority)
+    return 'f1-score', f1_score(y_agg, pred_agg)
 
-    def transform(self, X):
-        return X[:, self.indices]
+
+def fpreproc(dtrain, dtest, param):
+    label = dtrain.get_label()
+    ratio = float(np.sum(label == 0)) / np.sum(label == 1)
+    param['scale_pos_weight'] = ratio
+    return (dtrain, dtest, param)
 
 
 class Score:
     def __init__(self, X, y):
-        self.X = X
-        self.y = y
+        self.dtrain = xgb.DMatrix(X, label=y)
 
     def get_score(self, params):
         params['max_depth'] = int(params['max_depth'])
         params['min_child_weight'] = int(params['min_child_weight'])
-        params['n_estimators'] = int(params['n_estimators'])
+        params['num_boost_round'] = int(params['num_boost_round'])
 
-        k_val = params.pop('k')
         print('Training with params:')
         print(params)
 
-        forest = ExtraTreesClassifier(n_estimators=1000,
-                                      criterion='entropy',
-                                      max_features='sqrt',
-                                      max_depth=6,
-                                      min_samples_split=8,
-                                      n_jobs=-1,
-                                      bootstrap=True,
-                                      oob_score=True,
-                                      verbose=1,
-                                      class_weight='balanced')
+        cv_result = xgb.cv(params=params,
+                           dtrain=self.dtrain,
+                           num_boost_round=params['num_boost_round'],
+                           nfold=5,
+                           stratified=True,
+                           feval=evalF1,
+                           maximize=True,
+                           fpreproc=fpreproc,
+                           verbose_eval=True)
 
-        clf = xgb.XGBClassifier(**params)
-        pipeline = make_pipeline(selectKFromModel(forest, k=k_val), clf)
-        score = cross_val_score(estimator=pipeline,
-                                X=self.X,
-                                y=self.y,
-                                scoring='f1',
-                                cv=StratifiedKFold(self.y, 4, True),
-                                n_jobs=-1,
-                                verbose=1)
+        score = cv_result.ix[params['num_boost_round'] - 1, 0]
         print(score)
-        return {'loss': -np.mean(score), 'status': STATUS_OK}
+        return {'loss': -score, 'status': STATUS_OK}
 
 
 def optimize(trials, X, y, max_evals):
     space = {
-        'k': hp.quniform('k', 200, 1000, 100),
-        'n_estimators': hp.quniform('n_estimators', 10, 100, 10),
-        'learning_rate': hp.quniform('learning_rate', 0.1, 0.3, 0.1),
+        'num_boost_round': hp.quniform('num_boost_round', 10, 150, 10),
+        'eta': hp.quniform('eta', 0.1, 0.3, 0.1),
         'gamma': hp.quniform('gamma', 0, 1, 0.2),
-        'max_depth': hp.quniform('max_depth', 1, 6, 1),
-        'min_child_weight': hp.quniform('min_child_weight', 1, 3, 1),
-        'subsample': hp.quniform('subsample', 0.8, 1, 0.1),
+        'max_depth': hp.quniform('max_depth', 1, 8, 1),
+        'min_child_weight': hp.quniform('min_child_weight', 1, 5, 1),
+        'subsample': hp.quniform('subsample', 0.7, 1, 0.1),
+        'colsample_bytree': hp.quniform('colsample_bytree', 0.5, 1, 0.1),
+        'colsample_bylevel': hp.quniform('colsample_bylevel', 0.5, 1, 0.1),
         'silent': 1,
-        'objective': 'binary:logistic',
-        'scale_pos_weight': float(np.sum(y == 0)) / np.sum(y == 1)
+        'objective': 'binary:logistic'
     }
     s = Score(X, y)
     best = fmin(s.get_score,
@@ -102,34 +87,25 @@ def optimize(trials, X, y, max_evals):
                 )
     best['max_depth'] = int(best['max_depth'])
     best['min_child_weight'] = int(best['min_child_weight'])
-    best['n_estimators'] = int(best['n_estimators'])
-    best['silent'] = 1
-    best['objective'] = 'binary:logistic'
-    best['scale_pos_weight'] = float(np.sum(y == 0)) / np.sum(y == 1)
+    best['num_boost_round'] = int(best['num_boost_round'])
     del s
     return best
 
 
 def get_model(params, X, y):
-    print('best params')
-    print(params)
+    dtrain = xgb.DMatrix(X, label=y)
+    params['silent'] = 1
+    params['objective'] = 'binary:logistic'
+    params['scale_pos_weight'] = float(np.sum(y == 0)) / np.sum(y == 1)
 
-    k_val = params.pop('k')
-    forest = ExtraTreesClassifier(n_estimators=1000,
-                                  criterion='entropy',
-                                  max_features='sqrt',
-                                  max_depth=6,
-                                  min_samples_split=8,
-                                  n_jobs=-1,
-                                  bootstrap=True,
-                                  oob_score=True,
-                                  verbose=1,
-                                  class_weight='balanced')
-
-    clf = xgb.XGBClassifier(**params)
-    pipeline = make_pipeline(selectKFromModel(forest, k=k_val), clf)
-    pipeline.fit(X, y)
-    return pipeline
+    bst = xgb.train(params=params,
+                    dtrain=dtrain,
+                    num_boost_round=params['num_boost_round'],
+                    evals=[(dtrain, 'train')],
+                    feval=evalF1,
+                    maximize=True,
+                    verbose_eval=None)
+    return bst
 
 
 args = parse_args()
@@ -148,9 +124,11 @@ X_test_all = np.hstack((X_test, X_test_pic))
 print(X_train_all.shape, X_test_all.shape)
 
 trials = Trials()
-params = optimize(trials, X_train_all, y_train, 30)
+params = optimize(trials, X_train_all, y_train, 100)
 model = get_model(params, X_train_all, y_train)
-preds = model.predict_proba(X_test_all)[:, 1]
+
+d_test = xgb.DMatrix(X_test_all)
+preds = model.predict(d_test)
 
 save_dir = '../level4-model/' + str(args.yix)
 print(save_dir)
