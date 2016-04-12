@@ -71,5 +71,5 @@ for data in data_ch:
             lvl2_trans.append(level2_pred(data, prob, reps, global_args.yix))
 print(lvl2_trans)
 
-lvl2_pred = make_union(lvl2_trans)
+lvl2_pred = make_union(*lvl2_trans)
 print(lvl2_pred.transform(X).shape)
