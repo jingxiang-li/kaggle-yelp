@@ -47,7 +47,7 @@ with open('../level4-model/' + str(args.yix) + '/param.pkl', 'rb') as f:
 print(X_train.shape, X_test.shape, y_train.shape, y_test_init.shape)
 print(params)
 
-y_test_prob = y_test_init
+y_test_prob = np.copy(y_test_init)
 y_test_class = (y_test_init > 0.5).astype(int)
 
 for replication in range(10):
