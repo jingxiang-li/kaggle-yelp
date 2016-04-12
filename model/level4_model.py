@@ -128,6 +128,7 @@ def get_model(params, X, y):
 
     clf = xgb.XGBClassifier(**params)
     pipeline = make_pipeline(selectKFromModel(forest, k=k_val), clf)
+    pipeline.fit(X, y)
     return pipeline
 
 
@@ -149,7 +150,7 @@ print(X_train_all.shape, X_test_all.shape)
 trials = Trials()
 params = optimize(trials, X_train_all, y_train, 100)
 model = get_model(params, X_train_all, y_train)
-preds = model.predict(X_test_all)
+preds = model.predict_proba(X_test_all)[:, 1]
 
 save_dir = '../level4-model/' + str(args.yix)
 print(save_dir)
