@@ -50,7 +50,7 @@ print(params)
 y_test_prob = np.copy(y_test_init)
 y_test_class = (y_test_init > 0.5).astype(int)
 
-for replication in range(10):
+for replication in range(20):
     for train_ix, test_ix in StratifiedKFold(y_test_class,
                                              n_folds=5,
                                              shuffle=True):
