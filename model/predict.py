@@ -101,11 +101,11 @@ class level3_pred:
                   '/model.pkl', 'rb') as f:
             bst = pickle.load(f)
 
-        with open('./level3-model-final/' + str(self.args.yix) +
+        with open('../level3-model-final/' + str(self.args.yix) +
                   '/model_rf.pkl', 'rb') as f:
             rf = pickle.load(f)
 
-        with open('./level3-model-final/' + str(self.args.yix) +
+        with open('../level3-model-final/' + str(self.args.yix) +
                   '/model_ext.pkl', 'rb') as f:
             ext = pickle.load(f)
 
