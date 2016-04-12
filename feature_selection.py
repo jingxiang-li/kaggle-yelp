@@ -14,6 +14,10 @@ from sklearn.cluster import KMeans
 import argparse
 import os
 from os import path
+import pickle
+
+
+np.random.seed(123)
 
 
 def parse_args():
@@ -58,26 +62,30 @@ def get_extra_features(args):
                              StandardScaler(),
                              make_union(pca, ica, kmeans))
 
-    X_train = np.load("feature/1_100/X_train.npy")
-    y_train = np.load("feature/1_100/y_train.npy")
-    X_test = np.load("feature/1_100/X_test.npy")
+    X_train = np.load('feature/1_100/X_train.npy')
+    y_train = np.load('feature/1_100/y_train.npy')
+    X_test = np.load('feature/1_100/X_test.npy')
 
     pipeline.fit(X_train, y_train[:, args.yix])
     sel_ixs = pipeline.steps[0][1].indices[:500]
     X_train_ext = np.hstack((pipeline.transform(X_train), X_train[:, sel_ixs]))
     X_test_ext = np.hstack((pipeline.transform(X_test), X_test[:, sel_ixs]))
+
+    with open(path.join(save_dir, 'pipe.pkl'), 'wb') as f_pipe:
+        pickle.dump(pipeline, f_pipe)
+
+    np.save(path.join(save_dir, 'selix.npy'), sel_ixs)
     return X_train_ext, X_test_ext
 
 
 args = parse_args()
 print(args.yix)
 
-X_train_ext, X_test_ext = get_extra_features(args)
-
-save_dir = "extra_ftrs/" + str(args.yix)
+save_dir = 'extra_ftrs/' + str(args.yix)
 print(save_dir)
 if not path.exists(save_dir):
     os.makedirs(save_dir)
 
-np.save(path.join(save_dir, "X_train_ext.npy"), X_train_ext)
-np.save(path.join(save_dir, "X_test_ext.npy"), X_test_ext)
+X_train_ext, X_test_ext = get_extra_features(args)
+np.save(path.join(save_dir, 'X_train_ext.npy'), X_train_ext)
+np.save(path.join(save_dir, 'X_test_ext.npy'), X_test_ext)
