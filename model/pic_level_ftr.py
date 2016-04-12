@@ -5,11 +5,10 @@ from __future__ import unicode_literals
 
 import numpy as np
 import argparse
+import os
 from os import path
-import pickle
-import pandas as pd
 
-from predict import get_level4_features
+from predict import get_level4_features, selectKFromModel
 
 
 def parse_args():
@@ -20,50 +19,57 @@ def parse_args():
 
 def agg_function(x):
     return np.concatenate(([np.mean(x),
-                           np.std(x)],
+                            np.std(x)],
                            np.percentile(x, range(0, 101, 10)),
                            [np.sum(x > 0.5) / x.size,
-                           np.sum(x > 0.55) / x.size,
-                           np.sum(x > 0.6) / x.size,
-                           np.sum(x > 0.65) / x.size,
-                           np.sum(x > 0.7) / x.size,
-                           np.sum(x > 0.45) / x.size,
-                           np.sum(x > 0.4) / x.size,
-                           np.sum(x > 0.35) / x.size,
-                           np.sum(x > 0.3) / x.size,
-                           np.sum(x > 0.5),
-                           np.sum(x > 0.55),
-                           np.sum(x > 0.6),
-                           np.sum(x > 0.65),
-                           np.sum(x > 0.7),
-                           np.sum(x > 0.45),
-                           np.sum(x > 0.4),
-                           np.sum(x > 0.35),
-                           np.sum(x > 0.3),
-                           x.size]))
+                            np.sum(x > 0.55) / x.size,
+                            np.sum(x > 0.6) / x.size,
+                            np.sum(x > 0.65) / x.size,
+                            np.sum(x > 0.7) / x.size,
+                            np.sum(x > 0.45) / x.size,
+                            np.sum(x > 0.4) / x.size,
+                            np.sum(x > 0.35) / x.size,
+                            np.sum(x > 0.3) / x.size,
+                            np.sum(x > 0.5),
+                            np.sum(x > 0.55),
+                            np.sum(x > 0.6),
+                            np.sum(x > 0.65),
+                            np.sum(x > 0.7),
+                            np.sum(x > 0.45),
+                            np.sum(x > 0.4),
+                            np.sum(x > 0.35),
+                            np.sum(x > 0.3),
+                            x.size]))
 
 args = parse_args()
 
-img_df = pd.read_csv('../data/imglist_train.txt', sep='\t', header=None)
-img_index = img_df.ix[:, 0].as_matrix()
+save_dir = path.join("../pic-feature/" + str(args.yix))
+if not path.exists(save_dir):
+    os.makedirs(save_dir)
+
 feature_21k = np.load('../feature/inception-21k-train.npy')
 feature_colHist = np.load('../feature/colHist-train.npy')
 feature_v3 = np.load('../feature/inception-v3-train.npy')
 
 ft_raw_tmp = np.hstack((feature_21k, feature_colHist, feature_v3))
-print(ft_raw_tmp.shape)
 ft_raw = np.hstack((ft_raw_tmp, np.zeros((ft_raw_tmp.shape[0], 3458))))
-print(ft_raw.shape)
 ft_lvl4 = get_level4_features(ft_raw, args)
-print(ft_lvl4.shape)
 
+np.save(path.join(save_dir, 'pic_train.npy'), ft_lvl4)
 
-# img_feature_df = pd.DataFrame(
-#     data=np.hstack((feature_21k, feature_colHist, feature_v3)),
-#     index=img_index)
+del feature_21k
+del feature_colHist
+del feature_v3
+del ft_raw_tmp
+del ft_raw
+del ft_lvl4
 
-# photo2biz = pd.read_csv(
-#     "data/train_photo_to_biz_ids.csv", index_col='photo_id')
-# biz_list = photo2biz["business_id"].unique()
+feature_21k = np.load('../feature/inception-21k-test.npy')
+feature_colHist = np.load('../feature/colHist-test.npy')
+feature_v3 = np.load('../feature/inception-v3-test.npy')
 
-# get_level4_features
+ft_raw_tmp = np.hstack((feature_21k, feature_colHist, feature_v3))
+ft_raw = np.hstack((ft_raw_tmp, np.zeros((ft_raw_tmp.shape[0], 3458))))
+ft_lvl4 = get_level4_features(ft_raw, args)
+
+np.save(path.join(save_dir, 'pic_test.npy'), ft_lvl4)
