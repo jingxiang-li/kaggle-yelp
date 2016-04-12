@@ -52,15 +52,17 @@ y_test_class = (y_test_init > 0.5).astype(int)
 
 for replication in range(10):
     for train_ix, test_ix in StratifiedKFold(y_test_class,
-                                             n_fold=5,
+                                             n_folds=5,
                                              shuffle=True):
         X = np.vstack((X_train, X_test[train_ix, :]))
         y = np.hstack((y_train, y_test_class[train_ix]))
+        print(X.shape)
+        print(y.shape)
         dtrain = xgb.DMatrix(X, y)
         bst = xgb.train(params=params,
                         dtrain=dtrain,
                         num_boost_round=params['num_boost_round'])
-        dtest = xgb.DMatrix(X_test[test_is, :])
+        dtest = xgb.DMatrix(X_test[test_ix, :])
         pred = bst.predict(dtest)
         y_test_prob[test_ix] = pred
         y_test_class[test_ix] = (pred > 0.5).astype(int)
