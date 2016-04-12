@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00,nodes=1:ppn=24,mem=32gb
+
+source ~/.bashrc
+cd /home/yangyh/lixx3899/kaggle-yelp
+python feature_selection.py --yix 0
+python feature_selection.py --yix 1
+python feature_selection.py --yix 2
+python feature_selection.py --yix 3
+python feature_selection.py --yix 4
+python feature_selection.py --yix 5
+python feature_selection.py --yix 6
+python feature_selection.py --yix 7
+python feature_selection.py --yix 8
